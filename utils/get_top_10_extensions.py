@@ -1,6 +1,6 @@
 import os
 from collections import defaultdict
-from os.path import join, splitext
+from os.path import splitext
 from tabulate import tabulate
 import time
 import pandas as pd
@@ -54,7 +54,7 @@ def get_fancy_table(top_10_extensions_list):
 if __name__ == "__main__":
     start_time = time.time()
 
-    from completist import Completist
+    from staff.completist import Completist
 
     completist = Completist('/')
 

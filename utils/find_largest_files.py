@@ -57,7 +57,7 @@ def get_fancy_filetable(ten_largest_files):
 if __name__ == "__main__":
     start_time = time.time()
 
-    from completist import Completist
+    from staff.completist import Completist
 
     completist = Completist('/')
 

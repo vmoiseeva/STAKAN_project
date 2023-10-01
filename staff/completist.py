@@ -52,12 +52,31 @@ class Completist:
 
 
 if __name__ == "__main__":
-    start_time = time.time()
-
+#     start_time = time.time()
+#
     completist = Completist('/')
-    completist.get_file_info()
-    output_file = completist.get_path_to_csv()
-    completist.write_to_csv(output_file)
+#     completist.get_file_info()
+#     output_file = completist.get_path_to_csv()
+#     completist.write_to_csv(output_file)
+#
+#     end_time = time.time()
+#     print(f"Program execution time: {end_time - start_time:.2f} seconds")
 
-    end_time = time.time()
-    print(f"Program execution time: {end_time - start_time:.2f} seconds")
+    # SHORT VERSION OF THE TABLE
+    original_csv_path = completist.get_path_to_csv()
+
+    # Specify the path to the new CSV file with the first 50 rows cut
+    new_csv_path = '/Users/valeriiamoiseeva/PycharmProjects/STAKAN_project/data/new_filedata.csv'
+
+    # Open the original CSV file for reading and the new CSV file for writing
+    with open(original_csv_path, 'r', newline='') as input_csv, open(new_csv_path, 'w', newline='') as output_csv:
+        # Create a CSV reader for the input file
+        reader = csv.reader(input_csv)
+
+        # Create a CSV writer for the output file
+        writer = csv.writer(output_csv)
+
+        # Skip the first 50 rows (header included)
+        for i, row in enumerate(reader, start=1):
+            if i < 50:
+                writer.writerow(row)

@@ -30,7 +30,7 @@ def count_files(full_path):
 if __name__ == "__main__":
     start_time = time.time()
 
-    from completist import Completist
+    from staff.completist import Completist
 
     completist = Completist('/')
 
