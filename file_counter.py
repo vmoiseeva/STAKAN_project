@@ -3,13 +3,13 @@ import time
 import pandas as pd
 
 
-def count_files(path, csv_file):
+def count_files(full_path):
     file_counter = 0
 
     # Check if the CSV file exists
-    if os.path.exists(csv_file):
+    if os.path.exists(full_path):
         # Get the file's modification time
-        file_modification_time = os.path.getmtime(csv_file)
+        file_modification_time = os.path.getmtime(full_path)
 
         # Calculate the current time
         current_time = time.time()
@@ -19,7 +19,7 @@ def count_files(path, csv_file):
             print("Warning: The CSV file should be updated.")
 
         # Read the CSV file using pandas
-        df = pd.read_csv(csv_file)
+        df = pd.read_csv(full_path)
 
         # Count the number of rows (files) in the CSV
         file_counter = len(df)
@@ -29,10 +29,13 @@ def count_files(path, csv_file):
 
 if __name__ == "__main__":
     start_time = time.time()
-    path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs'
-    csv_file = 'file_data.csv'
 
-    total_files = count_files(path, csv_file)
+    from completist import Completist
+
+    completist = Completist('/')
+
+    full_path = completist.get_path_to_csv()
+    total_files = count_files(full_path)
     end_time = time.time()
 
     print(f"Total files on your hard drive: {total_files}")

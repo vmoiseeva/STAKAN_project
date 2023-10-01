@@ -13,6 +13,9 @@ class Completist:
     def __init__(self, root_folder):
         self.root_folder = root_folder
         self.file_data = []
+        path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs'
+        filename = 'file_data.csv'
+        self.path_to_csv = os.path.join(path, filename)
 
     def get_file_info(self):
         for root, _, files in os.walk(self.root_folder):
@@ -25,7 +28,6 @@ class Completist:
                 except (FileNotFoundError, PermissionError):
                     pass
 
-
                 file_info = {
                     'Name': filename,
                     'Full Path': file_path,
@@ -36,7 +38,6 @@ class Completist:
 
                 self.file_data.append(file_info)
 
-
     def write_to_csv(self, output_file):
         with open(output_file, 'w', newline='') as csvfile:
             fieldnames = ['Name', 'Full Path', 'Size', 'Creation Date', 'Modification Date']
@@ -46,15 +47,17 @@ class Completist:
             for file_info in self.file_data:
                 writer.writerow(file_info)
 
+    def get_path_to_csv(self):
+        return self.path_to_csv
+
 
 if __name__ == "__main__":
     start_time = time.time()
-    root_folder = '/'
-    directory = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs'
-    output_file = os.path.join(directory, 'file_data.csv')
 
-    completist = Completist(root_folder)
+    completist = Completist('/')
     completist.get_file_info()
+    output_file = completist.get_path_to_csv()
     completist.write_to_csv(output_file)
+
     end_time = time.time()
     print(f"Program execution time: {end_time - start_time:.2f} seconds")

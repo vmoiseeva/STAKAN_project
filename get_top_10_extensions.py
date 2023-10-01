@@ -6,14 +6,14 @@ import time
 import pandas as pd
 
 
-def get_extensions(path, csv_file):
+def get_extensions(full_path):
     ext_dictionary = defaultdict(int)  # заводим словарь, чтобы с его помощью считать расширения
     ext_dictionary['NoExtension'] = 0  # отдельно оговариваем случай, когда у файла не находится расширение
 
     # Check if the CSV file exists
-    if os.path.exists(csv_file):
+    if os.path.exists(full_path):
         # Get the file's modification time
-        file_modification_time = os.path.getmtime(csv_file)
+        file_modification_time = os.path.getmtime(full_path)
 
         # Calculate the current time
         current_time = time.time()
@@ -23,7 +23,7 @@ def get_extensions(path, csv_file):
             print("Warning: The CSV file should be updated.")
 
         # Read the CSV file using pandas
-        df = pd.read_csv(csv_file)
+        df = pd.read_csv(full_path)
 
         for file_path in df['Full Path']:
             ext = splitext(file_path)[1]  # Get the file extension
@@ -53,10 +53,14 @@ def get_fancy_table(top_10_extensions_list):
 
 if __name__ == "__main__":
     start_time = time.time()
-    path = '/Users/valeriiamoiseeva/PycharmProjects/STAKAN_project'
-    csv_file = 'file_data.csv'
 
-    dict_of_ext = get_extensions(path, csv_file)
+    from completist import Completist
+
+    completist = Completist('/')
+
+    full_path = completist.get_path_to_csv()
+
+    dict_of_ext = get_extensions(full_path)
     top_10 = get_fancy_table(get_top_10_ext(dict_of_ext))
 
     end_time = time.time()
