@@ -1,77 +1,68 @@
 import os
-from os.path import join, splitext, getsize
+from os.path import getsize
 from tabulate import tabulate
+import pandas as pd
 import time
 
 """
-Проблема с этим кодом: выдает файлы-дубликаты (?) и долго считается
-Надо подумать, как улучшить
+Проблема с этим кодом: выдает файлы-дубликаты (?). Файл один, путей к нему -- два
 """
 
 
-def get_file_list(root_path):
-    """ Формирует список всех файлов, их расширений и путей к ним в заданной директории и во всех ее субдиректориях """
+def get_file_size(path, csv_file):
+    file_list = []  # список, в который будем складывать путь к файлу и размер этого файла
 
-    file_list = []
+    # Check if the CSV file exists
+    if os.path.exists(csv_file):
+        # Get the file's modification time
+        file_modification_time = os.path.getmtime(csv_file)
 
-    for root, _, files in os.walk(root_path):
-        for filename in files:
-            file_path = join(root, filename)
-            if not os.path.islink(file_path): # Добавила условие на проверку ссылок, не помогло
-                name, ext = splitext(filename)
-                file_list.append((name, file_path, ext))
+        # Calculate the current time
+        current_time = time.time()
+
+        # Check if the CSV file was modified more than two days ago
+        if current_time - file_modification_time > 2 * 24 * 3600:
+            print("Warning: The CSV file should be updated.")
+
+        # Read the CSV file using pandas
+        df = pd.read_csv(csv_file)
+
+        for file_path in df['Full Path']:
+            try:
+                file_size = getsize(file_path)  # получаем размер файла, путь к которому сформировали выше
+                file_list.append((file_path, file_size))  # добавляем полученные данные в список
+            except (FileNotFoundError, PermissionError):
+                pass
     return file_list
 
 
-def get_file_size(file_list, element_index=1):
-    """ Добавляет размеры файлов в список файлов
-     Принимает на вход список файлов и индекс элемента, в котором содержится путь к файлу
-     По умолчанию равен 1, так как в нашем списке путь находится по этому индексу
-     """
-    updated_file_list = []
-
-    for item in file_list:
-        if element_index < len(item):
-            file_path = item[element_index]
-            try:
-                size = getsize(file_path)
-                updated_file_list.append((*item, size))
-            except (FileNotFoundError, PermissionError):
-                pass
-        else:
-            print("Index out of range for this tuple.")
-
-
-    return updated_file_list
-
-
 def get_10_largest(file_list):
-    """ Сортирует список по размеру файлов """
-
-    ten_largest_files = sorted(file_list, key=lambda x: x[-1], reverse=True)[:10]
-
+    ten_largest_files = sorted(file_list, key=lambda x: x[1], reverse=True)[
+                        :10]  # сортируем список по убыванию и обрезаем до 10
     return ten_largest_files
 
 
-def create_table(list_of_files):
-    table_with_files = []
-    for i, (name, file_path, ext, size) in enumerate(list_of_files, start=1):
-        size_in_gb = size / (1024 ** 3)  # 1 GB = 1024^3 bytes
-        table_with_files.append([i, name, file_path, ext, f"{size_in_gb:.2f} GB"])
+def get_fancy_filetable(ten_largest_files):
+    # Создаем список списков, чтобы дальше создать из него красивую таблицу
+    table_ten_largest_files = []
+    for i, (file_path, file_size) in enumerate(ten_largest_files, start=1):
+        table_ten_largest_files.append([i, file_path, f"{file_size} bytes"])
 
-    table = tabulate(table_with_files, headers=["#", "Filename", "Path", "Extension", "Size"], tablefmt="fancy_grid")
+    # Создаем красивую таблицу
+    table = tabulate(table_ten_largest_files, headers=["#", "Path", "Size"], tablefmt="fancy_grid")
 
     return table
 
 
 if __name__ == "__main__":
     start_time = time.time()
-    root_path = os.path.abspath(os.sep)  # получаем доступ к корневой папке
-    all_files_list = get_file_list(root_path)
-    with_sizes = get_file_size(all_files_list)
-    ten_largest = get_10_largest(with_sizes)
-    fancy_ten_largest = create_table(ten_largest)
-    print("Top 10 largest files:")
-    print(fancy_ten_largest)
+    path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs'
+    csv_file = 'file_data.csv'
+
+    list_of_files = get_file_size(path, csv_file)
+    top_10 = get_fancy_filetable(get_10_largest(list_of_files))
+
     end_time = time.time()
+
     print(f"Program execution time: {end_time - start_time:.2f} seconds")
+    print(top_10)

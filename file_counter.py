@@ -29,7 +29,7 @@ def count_files(path, csv_file):
 
 if __name__ == "__main__":
     start_time = time.time()
-    path = '/Users/valeriiamoiseeva/PycharmProjects/STAKAN_project'
+    path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs'
     csv_file = 'file_data.csv'
 
     total_files = count_files(path, csv_file)

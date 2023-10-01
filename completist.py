@@ -50,11 +50,11 @@ class Completist:
 if __name__ == "__main__":
     start_time = time.time()
     root_folder = '/'
-    current_directory = os.getcwd()
-    output_file = os.path.join(current_directory, 'file_data.csv')
+    directory = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs'
+    output_file = os.path.join(directory, 'file_data.csv')
 
     completist = Completist(root_folder)
     completist.get_file_info()
     completist.write_to_csv(output_file)
     end_time = time.time()
-    print(f"Program execution time:{end_time - start_time:.2f} seconds")
+    print(f"Program execution time: {end_time - start_time:.2f} seconds")
