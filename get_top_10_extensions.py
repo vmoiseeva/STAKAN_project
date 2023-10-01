@@ -1,32 +1,45 @@
 import os
+from collections import defaultdict
 from os.path import join, splitext
 from tabulate import tabulate
 import time
+import pandas as pd
 
 
-def get_top_10_extensions(path):
-    start_time = time.time()
-    ext_dictionary = dict()  # заводим словарь, чтобы с его помощью считать расширения
+def get_extensions(path, csv_file):
+    ext_dictionary = defaultdict(int)  # заводим словарь, чтобы с его помощью считать расширения
     ext_dictionary['NoExtension'] = 0  # отдельно оговариваем случай, когда у файла не находится расширение
 
-    for root, _, files in os.walk(path):
-        for filename in files:
-            file_path = join(root, filename)
-            ext = splitext(file_path)[1]  # получаем расширение
-            if ext == '':
-                ext_dictionary['NoExtension'] += 1  # введем отдельный счетчик для файлов, у которых нет расширения
-                # насколько я понимаю, это в основном системные файлы, и поэтому я решила их не считать,
-                # решив, что сейчас нас интересуют файлы, которыми мы пользуемся (документы, фото и т.п.)
-                # но я полагаю, что если цель - изучить вообще все возможные файлы, придется разбираться
-                # и в типах системных файлов (но это уже, насколько я понимаю, не то же самое, что считать расширения)
-            else:
-                if ext in ext_dictionary:
-                    ext_dictionary[ext] += 1
-                else:
-                    ext_dictionary[ext] = 1
+    # Check if the CSV file exists
+    if os.path.exists(csv_file):
+        # Get the file's modification time
+        file_modification_time = os.path.getmtime(csv_file)
 
+        # Calculate the current time
+        current_time = time.time()
+
+        # Check if the CSV file was modified more than two days ago
+        if current_time - file_modification_time > 2 * 24 * 3600:
+            print("Warning: The CSV file should be updated.")
+
+        # Read the CSV file using pandas
+        df = pd.read_csv(csv_file)
+
+        for file_path in df['Full Path']:
+            ext = splitext(file_path)[1]  # Get the file extension
+            if ext == '':
+                ext_dictionary['NoExtension'] += 1
+            else:
+                ext_dictionary[ext] += 1
+
+    return ext_dictionary
+
+def get_top_10_ext(ext_dictionary):
     top_10_extensions_list = sorted(ext_dictionary.items(), key=lambda x: x[1], reverse=True)[:10]
 
+    return top_10_extensions_list
+
+def get_fancy_table(top_10_extensions_list):
     # Создаем список списков, чтобы дальше создать из него красивую таблицу
     table_top_10_extensions = []
     for i, (extension, count) in enumerate(top_10_extensions_list, start=1):
@@ -35,16 +48,17 @@ def get_top_10_extensions(path):
     # Создаем таблицу
     table = tabulate(table_top_10_extensions, headers=["#", "Extension", "Count"], tablefmt="fancy_grid")
 
-    # Считаем время, затраченное на выполнение программы
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-
-    return table, elapsed_time
+    return table
 
 
 if __name__ == "__main__":
-    root_path = os.path.abspath(os.sep) # получаем доступ к корневой папке
-    top_10_extensions, elapsed_time = get_top_10_extensions(root_path)
-    print("Top 10 extensions:")
-    print(top_10_extensions)
-    print(f"Program execution time: {elapsed_time:.2f} seconds")
+    start_time = time.time()
+    path = '/Users/valeriiamoiseeva/PycharmProjects/STAKAN_project'
+    csv_file = 'file_data.csv'
+
+    dict_of_ext = get_extensions(path, csv_file)
+    top_10 = get_fancy_table(get_top_10_ext(dict_of_ext))
+
+    end_time = time.time()
+    print(f"Program execution time:{end_time - start_time:.2f} seconds")
+    print(top_10)
