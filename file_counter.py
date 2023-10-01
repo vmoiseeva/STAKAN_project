@@ -36,4 +36,4 @@ if __name__ == "__main__":
     end_time = time.time()
 
     print(f"Total files on your hard drive: {total_files}")
-    print(f"Program execution time:{end_time - start_time:.2f} seconds")
+    print(f"Program execution time: {end_time - start_time:.2f} seconds")

@@ -60,5 +60,5 @@ if __name__ == "__main__":
     top_10 = get_fancy_table(get_top_10_ext(dict_of_ext))
 
     end_time = time.time()
-    print(f"Program execution time:{end_time - start_time:.2f} seconds")
+    print(f"Program execution time: {end_time - start_time:.2f} seconds")
     print(top_10)

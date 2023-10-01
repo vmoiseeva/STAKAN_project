@@ -3,6 +3,11 @@ from os.path import join, splitext, getsize
 from tabulate import tabulate
 import time
 
+"""
+Проблема с этим кодом: выдает файлы-дубликаты (?) и долго считается
+Надо подумать, как улучшить
+"""
+
 
 def get_file_list(root_path):
     """ Формирует список всех файлов, их расширений и путей к ним в заданной директории и во всех ее субдиректориях """
@@ -12,8 +17,9 @@ def get_file_list(root_path):
     for root, _, files in os.walk(root_path):
         for filename in files:
             file_path = join(root, filename)
-            name, ext = splitext(filename)
-            file_list.append((name, file_path, ext))
+            if not os.path.islink(file_path): # Добавила условие на проверку ссылок, не помогло
+                name, ext = splitext(filename)
+                file_list.append((name, file_path, ext))
     return file_list
 
 
