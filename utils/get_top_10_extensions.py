@@ -7,8 +7,7 @@ import pandas as pd
 
 
 def get_extensions(full_path):
-    ext_dictionary = defaultdict(int)  # заводим словарь, чтобы с его помощью считать расширения
-    ext_dictionary['NoExtension'] = 0  # отдельно оговариваем случай, когда у файла не находится расширение
+    ext_dictionary = defaultdict(int)  # Create a dictionary to count extensions
 
     # Check if the CSV file exists
     if os.path.exists(full_path):
@@ -22,17 +21,16 @@ def get_extensions(full_path):
         if current_time - file_modification_time > 2 * 24 * 3600:
             print("Warning: The CSV file should be updated.")
 
-        # Read the CSV file using pandas
-        df = pd.read_csv(full_path)
+            df = pd.read_csv(full_path)
 
-        for file_path in df['Full Path']:
-            ext = splitext(file_path)[1]  # Get the file extension
-            if ext == '':
-                ext_dictionary['NoExtension'] += 1
-            else:
-                ext_dictionary[ext] += 1
+            # Extract the extension from the file path
+            df['File Extension'] = df['Full Path'].apply(lambda x: splitext(x)[1] if splitext(x)[1] else 'NoExtension')
 
-    return ext_dictionary
+            # Count ext and update the dictionary
+            ext_counts = df['File Extension'].value_counts().to_dict()
+            ext_dictionary.update(ext_counts)
+
+        return ext_dictionary
 
 def get_top_10_ext(ext_dictionary):
     top_10_extensions_list = sorted(ext_dictionary.items(), key=lambda x: x[1], reverse=True)[:10]
