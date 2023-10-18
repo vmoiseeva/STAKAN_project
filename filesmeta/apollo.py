@@ -1,7 +1,6 @@
 from filesmeta.history_muse import HistoryMuse
 from filesmeta.img_muse import IMGMuse
 from filesmeta.pdf_muse import PDFMuse
-from staff.completist import Completist
 from os.path import splitext
 
 
@@ -42,19 +41,19 @@ class Apollo:
         return all_metadata
 
 
-# a = Apollo()
-#
-# m1 = HistoryMuse()  # Create an instance of HistoryMuse
-# m2 = IMGMuse()      # Create an instance of IMGMuse
-# m3 = PDFMuse()      # Create an instance of PDFMuse
-#
-# a.add_muse(m1)
-# a.add_muse(m2)
-# a.add_muse(m3)
-#
-# file_paths = [
-#     '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs/test_data.csv',
-#     '/Users/valeriiamoiseeva/Downloads/IMG_5417.heic'
-# ]
-#
-# print(a.process_files(file_paths))
+a = Apollo()
+
+m1 = HistoryMuse()  # Create an instance of HistoryMuse
+m2 = IMGMuse()      # Create an instance of IMGMuse
+m3 = PDFMuse()      # Create an instance of PDFMuse
+
+a.add_muse(m1)
+a.add_muse(m2)
+a.add_muse(m3)
+
+file_paths = [
+    '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs/test_data.csv',
+    '/Users/valeriiamoiseeva/Downloads/IMG_5417.heic'
+]
+
+print(a.handle_files(file_paths))
