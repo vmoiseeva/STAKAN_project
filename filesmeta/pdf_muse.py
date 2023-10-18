@@ -1,5 +1,6 @@
 import PyPDF2
 
+
 class PDFMuse:
     ex = [".pdf"]
 
@@ -16,10 +17,3 @@ class PDFMuse:
             pass
 
         return metadata
-
-# if __name__ == "__main__":
-#     # Create an instance of the class with the path to the CSV file
-#     collector = PDFMuse()
-#
-#     # Collect and add file meta information to the CSV
-#     print(collector.get_meta_inf('/Users/valeriiamoiseeva/Downloads/Статистика ДЗ №3.pdf'))

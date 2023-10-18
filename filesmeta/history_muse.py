@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 
-
 class HistoryMuse:
     ex = ["*"]
 
@@ -23,10 +22,3 @@ class HistoryMuse:
                 pass
 
         return metadata
-
-# if __name__ == "__main__":
-#     # Create an instance of the class with the path to the CSV file
-#     collector = HistoryMuse()
-#
-#     # Collect and add file meta information to the CSV
-#     print(collector.get_meta_inf('/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs/file_data.csv'))
