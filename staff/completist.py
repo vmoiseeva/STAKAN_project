@@ -5,6 +5,7 @@ from filesmeta.apollo import Apollo
 from filesmeta.history_muse import HistoryMuse
 from filesmeta.img_muse import IMGMuse
 from filesmeta.pdf_muse import PDFMuse
+from filesmeta.ms_office_muse import MSOfficeMuse
 
 class Completist:
     def __init__(self, root_folder):
@@ -20,6 +21,7 @@ class Completist:
         self.apollo_dispatcher.add_muse(PDFMuse())
         self.apollo_dispatcher.add_muse(IMGMuse())
         self.apollo_dispatcher.add_muse(HistoryMuse())
+        self.apollo_dispatcher.add_muse(MSOfficeMuse())
 
     def get_file_info(self):
         for root, _, files in os.walk(self.root_folder):
