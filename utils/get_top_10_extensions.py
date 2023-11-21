@@ -38,12 +38,12 @@ def get_top_10_ext(ext_dictionary):
     return top_10_extensions_list
 
 def get_fancy_table(top_10_extensions_list):
-    # Создаем список списков, чтобы дальше создать из него красивую таблицу
+    # Create a list of lists to further create a table
     table_top_10_extensions = []
     for i, (extension, count) in enumerate(top_10_extensions_list, start=1):
         table_top_10_extensions.append([i, extension, count])
 
-    # Создаем таблицу
+    # Create a table
     table = tabulate(table_top_10_extensions, headers=["#", "Extension", "Count"], tablefmt="fancy_grid")
 
     return table

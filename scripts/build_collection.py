@@ -1,18 +1,21 @@
+import os
 import time
 from staff.completist import Completist
 
-root_folder = '/'
-completist = Completist(root_folder)
-
 def update_database(root_folder, database_path):
+    completist = Completist(root_folder)
 
     completist.get_file_info()
-    completist.write_to_csv(database_path)
+    completist.create_csv(database_path)
 
 if __name__ == "__main__":
     start_time = time.time()
 
-    database_path = completist.get_path_to_csv()
+    root_folder = '/Users/valeriiamoiseeva/Downloads'
+    database_path = os.path.join(
+        '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs',
+        'test_data.csv'
+    )
 
     # Call the update_database function
     update_database(root_folder, database_path)

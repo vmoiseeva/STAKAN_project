@@ -18,6 +18,7 @@ class Completist:
         # Initialize Apollo dispatcher
         self.apollo_dispatcher = Apollo()
 
+        # Initialize its Muses
         self.apollo_dispatcher.add_muse(PDFMuse())
         self.apollo_dispatcher.add_muse(IMGMuse())
         self.apollo_dispatcher.add_muse(HistoryMuse())
