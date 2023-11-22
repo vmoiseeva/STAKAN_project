@@ -1,36 +1,28 @@
 import os
 from collections import defaultdict
-from os.path import splitext
 from tabulate import tabulate
 import time
-import pandas as pd
+import sqlite3
 
 
-def get_extensions(full_path):
+def get_extensions(database_path):
     ext_dictionary = defaultdict(int)  # Create a dictionary to count extensions
 
-    # Check if the CSV file exists
-    if os.path.exists(full_path):
-        # Get the file's modification time
-        file_modification_time = os.path.getmtime(full_path)
+    conn = sqlite3.connect(database_path)
+    cursor = conn.cursor()
 
-        # Calculate the current time
-        current_time = time.time()
+    # Run a query to retrieve extension data
+    cursor.execute("SELECT file_path FROM file_metadata")
+    result = cursor.fetchall()
 
-        # Check if the CSV file was modified more than two days ago
-        if current_time - file_modification_time > 2 * 24 * 3600:
-            print("Warning: The CSV file should be updated.")
+    conn.close()
 
-            df = pd.read_csv(full_path)
+    for row in result:
+        file_path = row[0]
+        file_extension = os.path.splitext(file_path)[1] if os.path.splitext(file_path)[1] else 'NoExtension'
+        ext_dictionary[file_extension] += 1
 
-            # Extract the extension from the file path
-            df['File Extension'] = df['Full Path'].apply(lambda x: splitext(x)[1] if splitext(x)[1] else 'NoExtension')
-
-            # Count ext and update the dictionary
-            ext_counts = df['File Extension'].value_counts().to_dict()
-            ext_dictionary.update(ext_counts)
-
-        return ext_dictionary
+    return ext_dictionary
 
 def get_top_10_ext(ext_dictionary):
     top_10_extensions_list = sorted(ext_dictionary.items(), key=lambda x: x[1], reverse=True)[:10]
@@ -54,11 +46,12 @@ if __name__ == "__main__":
 
     from staff.completist import Completist
 
-    completist = Completist('/')
+    root_folder = '/Users/valeriiamoiseeva/Downloads'
+    database_path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs/database.db'
 
-    full_path = completist.get_path_to_csv()
+    completist = Completist(root_folder, database_path)
 
-    dict_of_ext = get_extensions(full_path)
+    dict_of_ext = get_extensions(database_path)
     top_10 = get_fancy_table(get_top_10_ext(dict_of_ext))
 
     end_time = time.time()

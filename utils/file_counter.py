@@ -1,30 +1,37 @@
-import os
+# import os
 import time
-import pandas as pd
+import sqlite3
 
-
-def count_files(full_path):
+def count_files(database_path):
     file_counter = 0
 
-    # Check if the CSV file exists
-    if os.path.exists(full_path):
-        # Get the file's modification time
-        file_modification_time = os.path.getmtime(full_path)
+    # Connect to the database
+    conn = sqlite3.connect(database_path)
+    cursor = conn.cursor()
 
-        # Calculate the current time
-        current_time = time.time()
+    cursor.execute("SELECT COUNT(*) FROM file_metadata")
+    result = cursor.fetchone()
 
-        # Check if the CSV file was modified more than two days ago
-        if current_time - file_modification_time > 2 * 24 * 3600:
-            print("Warning: The CSV file should be updated.")
+    if result:
+        file_counter = result[0]
 
-        # Read the CSV file using pandas
-        df = pd.read_csv(full_path)
-
-        # Count the number of rows (files) in the CSV
-        file_counter = len(df)
+    conn.close()
 
     return file_counter
+
+# НАДО написать отдельную функцию для проверки существования и актуальности БД, которую
+# можно использовать во всех утилитах?
+    # # Check if the CSV file exists
+    # if os.path.exists(full_path):
+    #     # Get the file's modification time
+    #     file_modification_time = os.path.getmtime(full_path)
+    #
+    #     # Calculate the current time
+    #     current_time = time.time()
+    #
+    #     # Check if the CSV file was modified more than two days ago
+    #     if current_time - file_modification_time > 2 * 24 * 3600:
+    #         print("Warning: The CSV file should be updated.")
 
 
 if __name__ == "__main__":
@@ -32,10 +39,12 @@ if __name__ == "__main__":
 
     from staff.completist import Completist
 
-    completist = Completist('/')
+    root_folder = '/Users/valeriiamoiseeva/Downloads'
+    database_path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs/database.db'
 
-    full_path = completist.get_path_to_csv()
-    total_files = count_files(full_path)
+    completist = Completist(root_folder, database_path)
+    total_files = count_files(database_path)
+
     end_time = time.time()
 
     print(f"Total files on your hard drive: {total_files}")
