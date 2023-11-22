@@ -3,10 +3,9 @@ import time
 from staff.completist import Completist
 
 def update_database(root_folder, database_path):
-    completist = Completist(root_folder)
 
-    completist.get_file_info()
-    completist.create_csv(database_path)
+    completist = Completist(root_folder, database_path)
+    completist.process_files()
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -14,10 +13,9 @@ if __name__ == "__main__":
     root_folder = '/Users/valeriiamoiseeva/Downloads'
     database_path = os.path.join(
         '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs',
-        'test_data.csv'
+        'test_data.db'
     )
 
-    # Call the update_database function
     update_database(root_folder, database_path)
 
     end_time = time.time()
