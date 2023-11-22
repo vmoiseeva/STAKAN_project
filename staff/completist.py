@@ -1,6 +1,6 @@
 import os
+import sqlite3
 from os.path import splitext
-import csv
 from filesmeta.apollo import Apollo
 from filesmeta.history_muse import HistoryMuse
 from filesmeta.img_muse import IMGMuse
@@ -8,12 +8,12 @@ from filesmeta.pdf_muse import PDFMuse
 from filesmeta.ms_office_muse import MSOfficeMuse
 
 class Completist:
-    def __init__(self, root_folder):
+    def __init__(self, root_folder, database_path):
         self.root_folder = root_folder
         self.file_data = []
-        path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs'
-        filename = 'test_data.csv'
-        self.path_to_csv = os.path.join(path, filename)
+        # path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs'
+        # filename = 'test_data.csv'
+        self.database_path = database_path
 
         # Initialize Apollo dispatcher
         self.apollo_dispatcher = Apollo()
@@ -24,36 +24,75 @@ class Completist:
         self.apollo_dispatcher.add_muse(HistoryMuse())
         self.apollo_dispatcher.add_muse(MSOfficeMuse())
 
-    def get_file_info(self):
-        for root, _, files in os.walk(self.root_folder):
-            for filename in files:
+    def get_file_info_generator(self):
+        for root, _, files_list in os.walk(self.root_folder):
+            for filename in files_list:
                 file_path = os.path.join(root, filename)
                 ext = splitext(file_path)[1] or '.no_extension'
 
                 # Use the Apollo dispatcher to get metadata
                 file_file_overview = self.apollo_dispatcher.get_meta_inf(file_path)
 
-                self.file_data.append(file_file_overview)
+                yield file_file_overview
 
-    def create_csv(self, output_file):
-        with open(output_file, 'w', newline='') as csvfile:
-            # Get the fieldnames from the metadata dictionaries
-            fieldnames = set()
-            for file_info in self.file_data:
-                fieldnames.update(file_info.keys())
+    def process_files(self):
+        for file_info in self.get_file_info_generator():
+            # Process the files one by one
+            self.save_to_database(file_info)
 
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    def save_to_database(self, file_info):
+        conn = sqlite3.connect(self.database_path)
+        cursor = conn.cursor()
 
-            writer.writeheader()
-            for file_info in self.file_data:
-                writer.writerow(file_info)
+        # Create table if doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS file_metadata (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                file_name TEXT,
+                file_size INTEGER,
+                file_path TEXT,
+                creation_date TEXT,
+                modification_date TEXT,
+                image_width INTEGER,
+                image_height INTEGER,
+                resolution TEXT,
+                compression TEXT,
+                orientation TEXT,
+                pages INTEGER,
+                slides INTEGER,
+                sheets INTEGER
+            )
+        ''')
 
-    def get_path_to_csv(self):
-        return self.path_to_csv
+        # Insert metadata into the DB
+        cursor.execute('''
+            INSERT INTO file_metadata (
+                file_name, file_size, file_path, creation_date, modification_date,
+                image_width, image_height, resolution, compression, orientation, pages, slides, sheets
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            file_info.get('File Name', ''),
+            file_info.get('File Size', 0),
+            file_info.get('File Path', ''),
+            file_info.get('Creation Date', ''),
+            file_info.get('Modification Date', ''),
+            file_info.get('Image Width', 0),
+            file_info.get('Image Height', 0),
+            str(file_info.get('Resolution', '')),
+            file_info.get('Compression', ''),
+            file_info.get('Orientation', ''),
+            file_info.get('Pages', 0),
+            file_info.get('Slides', 0),
+            file_info.get('Sheets', 0)
+        ))
+
+        # Save changes and close connection
+        conn.commit()
+        conn.close()
 
 if __name__ == '__main__':
     root_folder = '/Users/valeriiamoiseeva/Downloads'
-    completist = Completist(root_folder)
-    completist.get_file_info()  # Gather metadata for files in the root folder
-    output_csv_path = completist.get_path_to_csv()
-    completist.create_csv(output_csv_path)  # Write the metadata to a CSV file
+    database_path = '/Users/valeriiamoiseeva/Documents/Studies/PANDAN/year_2/Prog_techs/database.db'
+    completist = Completist(root_folder, database_path)
+    completist.process_files()
