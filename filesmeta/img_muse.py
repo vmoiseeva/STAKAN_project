@@ -11,11 +11,21 @@ class IMGMuse:
         try:
             with Image.open(path) as img:
                 width, height = img.size
+                resolution = img.info.get("dpi")
+                compression = img.info.get("compression")
+                orientation = img.info.get("exif")
+
 
         except (FileNotFoundError, PermissionError):
             width, height = None, None
+            resolution = None
+            compression = None
+            orientation = None
 
         metadata["Image Width"] = width
         metadata["Image Height"] = height
+        metadata["Resolution"] = resolution
+        metadata["Compression"] = compression
+        metadata["Orientation"] = orientation
 
         return metadata
