@@ -3,10 +3,6 @@ import sqlite3
 from tabulate import tabulate
 import time
 
-"""
-Надо проверить: иногда выдает файлы-дубликаты (?). Файл один, путей к нему -- два
-"""
-
 
 def get_file_size(database_path):
     conn = sqlite3.connect(database_path)
