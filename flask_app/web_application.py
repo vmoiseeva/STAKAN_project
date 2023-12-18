@@ -1,7 +1,9 @@
 from flask import Flask, render_template, url_for
-from utils.file_counter import count_files
-import time
 import os
+from utils.file_counter import count_files
+from utils.get_top_10_extensions import get_extensions, get_top_10_ext
+from utils.find_largest_files import get_file_size
+import time
 
 app = Flask(__name__)
 
@@ -18,11 +20,19 @@ def index():
 
 @app.route('/statistics_by_extensions')
 def statistics_by_extensions():
-    return 'here is my stat by extension'
+    dict_of_ext = get_extensions(database_path)
+    top_10_ext = get_top_10_ext(dict_of_ext)
 
-@app.route('/top_10_statistics_by_size')
+    return render_template('stat_by_extension.html', top_10_ext=top_10_ext)
+
+@app.route('/statistics_by_size')
 def top_10_statistics_by_size():
-    return 'here is my stat by size'
+    list_of_largest_files = get_file_size(database_path)
+
+    # Convert sizes to gigabytes
+    list_of_largest_files_gb = [(file, round(size / (1024 ** 3), 4)) for file, size in list_of_largest_files]
+
+    return render_template('stat_by_size.html', list_of_largest_files=list_of_largest_files_gb)
 
 if __name__ == '__main__':
     app.run(debug=True)
